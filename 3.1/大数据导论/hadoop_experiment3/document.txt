@@ -1,0 +1,4 @@
+Hadoop MapReduce is a powerful framework for processing big data. 
+MapReduce allows programmers to process large datasets in parallel on clusters.
+Hadoop is widely used in the industry for big data analytics.
+Big data technologies like Hadoop and MapReduce are essential today.

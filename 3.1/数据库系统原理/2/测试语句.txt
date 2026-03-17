@@ -1,0 +1,13 @@
+1.CALL GetDeptEmployees('d1');
+
+2.CALL ShowMaxSalaryDept();
+
+3.UPDATE department SET dnumber='d10' WHERE dnumber='d1';
+-- employee 表中 dno='d1' 的员工会被自动更新为 d10
+select * from employee
+--验证是否更新
+
+4.DELETE FROM employee WHERE ssn='23010119950101XXXX';
+-- 同时删除该员工在 works_on 和 dependent 表中的记录
+select * from works_on
+--验证是否删除

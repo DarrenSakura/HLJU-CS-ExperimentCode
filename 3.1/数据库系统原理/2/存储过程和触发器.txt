@@ -1,0 +1,76 @@
+1.
+DELIMITER $$
+
+CREATE PROCEDURE GetDeptEmployees(IN p_dno CHAR(3))
+BEGIN
+    SELECT e.name AS 员工姓名,
+           e.ssn AS 身份证号,
+           e.bdate AS 出生日期,
+           e.address AS 地址,
+           e.sex AS 性别,
+           e.salary AS 工资,
+           p.pname AS 项目名称,
+           p.pnumber AS 项目编号,
+           w.hours AS 工作小时数
+    FROM employee e
+    JOIN department d ON e.dno = d.dnumber
+    LEFT JOIN works_on w ON e.ssn = w.essn
+    LEFT JOIN project p ON w.pno = p.pnumber
+    WHERE e.dno = p_dno;
+END$$
+
+DELIMITER ;
+
+2.DELIMITER $$
+
+CREATE PROCEDURE ShowMaxSalaryDept()
+BEGIN
+    DECLARE v_max_salary FLOAT;
+    DECLARE v_dno CHAR(3);
+
+    -- 找出最高工资及其部门号
+    SELECT salary, dno INTO v_max_salary, v_dno
+    FROM employee
+    ORDER BY salary DESC
+    LIMIT 1;
+
+    -- 输出该部门名称和最高工资
+    SELECT d.dname AS 部门名称, v_max_salary AS 最高工资
+    FROM department d
+    WHERE d.dnumber = v_dno;
+
+    -- 输出该部门所有职工信息
+    SELECT e.*
+    FROM employee e
+    WHERE e.dno = v_dno;
+END$$
+
+DELIMITER ;
+
+3.DELIMITER $$
+
+CREATE TRIGGER depart_update
+AFTER UPDATE ON department
+FOR EACH ROW
+BEGIN
+    IF NEW.dnumber <> OLD.dnumber THEN
+        UPDATE employee
+        SET dno = NEW.dnumber
+        WHERE dno = OLD.dnumber;
+    END IF;
+END$$
+
+DELIMITER ;
+
+4.
+DELIMITER $$
+
+CREATE TRIGGER employee_delete
+BEFORE DELETE ON employee
+FOR EACH ROW
+BEGIN
+    DELETE FROM works_on WHERE essn = OLD.ssn;
+    DELETE FROM dependent WHERE essn = OLD.ssn;
+END$$
+
+DELIMITER ;

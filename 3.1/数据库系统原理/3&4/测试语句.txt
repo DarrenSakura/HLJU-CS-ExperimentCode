@@ -1,0 +1,41 @@
+//每次打开都运行一次
+use test
+
+//测试drop
+create database test1
+drop database test1
+use test1
+
+//测试delete
+DELETE FROM employee WHERE ssn = '230101198009081234'
+SELECT * FROM employee
+
+DELETE FROM employee
+SELECT * FROM employee
+
+//测试select
+select name, dname from employee, department
+
+select name, dname from employee, department where department.dname = '研发部'
+
+select * from employee, department
+
+select name, dname from employee, department where dno = dnumber and department.dname = '研发部'
+
+select name, dname from employee, department where dno = dnumber and department.dname = '研发部' and sex = '男' and employee.bdate > '1980-01-01'
+
+select name, pname, hours from employee, project, works_on where employee.ssn = essn and project.pnumber = pno and sex = '男' and employee.bdate > '1980-01-01'
+
+select name, pname, hours from department, employee, project, works_on where dnumber = dno and dname = '研发部' and employee.ssn = essn and project.pnumber = pno and sex = '男' and employee.salary > 3000
+
+select * from department, employee, project, works_on where dnumber = dno and dname = '研发部' and employee.ssn = essn and project.pnumber = pno and sex = '男' and employee.salary > 3000
+
+select name, dependent_name, pname, hours from department, employee, project, works_on, dependent where dependent.essn = ssn and dnumber = dno and dname = '研发部' and employee.ssn = works_on.essn and project.pnumber = pno and employee.sex = '男' and employee.salary > 3000
+
+select name, dependent_name, dname, dlocation, pname, hours from department, depart_location, employee, project, works_on, dependent where dependent.essn = ssn and department.dnumber = dno and dname = '研发部' and department.dnumber = depart_location.dnumber and employee.ssn = works_on.essn and project.pnumber = pno and employee.sex = '男' and employee.salary > 3000
+
+select * from department, depart_location, employee, project, works_on, dependent where dependent.essn = ssn and department.dnumber = dno and dname = '研发部' and department.dnumber = depart_location.dnumber and employee.ssn = works_on.essn and project.pnumber = pno and employee.sex = '男' and employee.salary > 3000
+
+select * from department, depart_location, employee, project, works_on, dependent where dname = '研发部' and salary > 3000
+
+select * from department, depart_location, employee, project, works_on, dependent

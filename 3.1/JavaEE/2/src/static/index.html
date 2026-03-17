@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>个人博客 - 首页</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- ================= 页面头部（LOGO + 导航栏） ================= -->
+<header class="header">
+    <div class="logo">MyBlog</div>
+    <nav class="nav">
+        <a href="index.html">首页</a>
+        <a href="login.html">登录</a>
+        <a href="#">关于</a>
+    </nav>
+</header>
+
+<!-- ================= 主体内容（左右布局：内容 + 侧边栏） ================= -->
+<div class="container">
+    <!-- 主内容区 -->
+    <main class="main content">
+        <h1>welcome to my 博客</h1>
+        <div class="posts">
+            <article class="post">
+                <h2>javaee学习</h2>
+                <p>学习 JavaEE 的核心知识，包括 Servlet、JSP、Spring 等内容。</p>
+            </article>
+            <article class="post">
+                <h2>javascript</h2>
+                <p>掌握 JS 基础语法、DOM 操作、事件处理以及异步编程技巧。</p>
+            </article>
+        </div>
+    </main>
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <!-- 搜索模块 -->
+        <div class="widget search">
+            <h3>搜索文章</h3>
+            <input type="text" placeholder="输入关键词...">
+            <button>搜索</button>
+        </div>
+
+        <!-- 关于作者 -->
+        <div class="widget about">
+            <h3>关于我</h3>
+            <div class="about">
+                <img src="images/avatar.jpg" alt="头像" class="avatar">
+                <p class="bio">我是 MyBlog 博主，分享 Java、前端开发和编程学习心得。</p>
+            </div>
+        </div>
+
+        <!-- 热门文章 -->
+        <div class="widget recent-posts">
+            <h3>热门文章</h3>
+            <ul>
+                <li><a href="#">JavaEE 快速入门</a></li>
+                <li><a href="#">JavaScript 异步编程指南</a></li>
+                <li><a href="#">前端布局技巧大全</a></li>
+            </ul>
+        </div>
+
+        <!-- 分类 -->
+        <div class="widget categories">
+            <h3>文章分类</h3>
+            <div class="cat-list">
+                <a href="#">Java</a>
+                <a href="#">前端</a>
+                <a href="#">数据库</a>
+                <a href="#">算法</a>
+            </div>
+        </div>
+
+        <!-- 标签云 -->
+        <div class="widget tags">
+            <h3>标签</h3>
+            <div class="tags">
+                <a href="#">HTML</a>
+                <a href="#">CSS</a>
+                <a href="#">JavaScript</a>
+                <a href="#">Spring</a>
+                <a href="#">MySQL</a>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- ================= 页脚 ================= -->
+<footer class="footer">
+    <p>&copy; 2025 my 博客 | 联系邮箱：wsdsb.com</p>
+</footer>
+</body>
+</html>

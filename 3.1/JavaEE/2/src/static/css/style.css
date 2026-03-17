@@ -1,0 +1,220 @@
+/* ==================== 全局样式 ==================== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* ==================== 头部 header 样式 ==================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0077b6;
+    padding: 15px 30px;
+    color: white;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nav a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+}
+.nav a:hover {
+    text-decoration: underline;
+}
+
+/* ==================== 页面容器（内容 + 侧边栏） ==================== */
+.container {
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ==================== 主内容区 ==================== */
+.main.content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 文章列表 */
+.posts {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.post {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* ==================== 登录表单样式 ==================== */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.login-form input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-form input.error {
+    border-color: red;
+}
+
+.login-form button {
+    padding: 10px;
+    background: #0077b6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.login-form button:hover {
+    background: #005f87;
+}
+
+/* ==================== 侧边栏 aside ==================== */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 小模块 widget */
+.widget {
+    background: #fff;
+    padding: 14px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+}
+
+.widget h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #0077b6;
+}
+
+/* about 模块 */
+.about {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.about .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.about .bio {
+    font-size: 14px;
+    color: #555;
+    margin: 0;
+}
+
+/* 搜索模块 */
+.search input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+.search button {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #0077b6;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* 热门文章 */
+.recent-posts ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.recent-posts li {
+    padding: 6px 0;
+    border-bottom: 1px dashed #eee;
+}
+.recent-posts li a {
+    color: #333;
+    font-size: 14px;
+}
+.recent-posts li:last-child {
+    border-bottom: none;
+}
+
+/* 分类 */
+.categories .cat-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.categories a {
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 13px;
+}
+
+/* 标签云 */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.tags a {
+    background: #eef6fb;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #0077b6;
+    font-size: 13px;
+}
+
+/* ==================== 页脚 footer 样式 ==================== */
+.footer {
+    text-align: center;
+    background: #0077b6;
+    color: white;
+    padding: 10px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* ==================== 响应式布局 ==================== */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}

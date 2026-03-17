@@ -1,0 +1,45 @@
+3.1 SELECT essn FROM works_on WHERE pno = 'p2'; 
+3.2 SELECT DISTINCT e.name FROM employee e JOIN works_on w ON e.ssn = w.essn JOIN project p ON w.pno = p.pnumber WHERE p.pname = '哈同公路'; 
+3.3 SELECT e.name FROM employee e JOIN department d ON e.dno = d.dnumber WHERE d.dname = '研发部'; 
+3.4 SELECT e.name, e.address FROM employee e JOIN department d ON e.dno = d.dnumber WHERE d.dname = '研发部'; 
+3.5 SELECT e.name, e.address FROM employee e JOIN department d ON e.dno = d.dnumber WHERE d.dname = '研发部' AND e.salary < 3000; 
+3.6 SELECT name FROM employee WHERE ssn NOT IN (SELECT essn FROM works_on WHERE pno = 'p1'); 
+3.7 SELECT e.name FROM employee e WHERE NOT EXISTS (SELECT 1 FROM dependent d WHERE d.essn = e.ssn); 
+3.8 SELECT e.name AS employee_name, dept.dname AS department_name FROM employee e JOIN department dept ON e.dno = dept.dnumber WHERE e.superssn = (SELECT ssn FROM employee WHERE name = '张红'); 
+3.9 SELECT essn FROM works_on GROUP BY essn HAVING COUNT(DISTINCT pno) >= 3; 
+3.10 SELECT essn FROM works_on WHERE pno IN ('p1','p2') GROUP BY essn HAVING COUNT(DISTINCT pno) = 2; 
+3.11 SELECT e.ssn, e.name FROM employee e LEFT JOIN works_on w ON e.ssn = w.essn GROUP BY e.ssn, e.name HAVING COUNT(DISTINCT w.pno) = (SELECT COUNT(*) FROM project); 
+3.12 SELECT DISTINCT e.name FROM employee e JOIN works_on w ON e.ssn = w.essn WHERE w.pno = 'p2' AND e.salary < (SELECT salary FROM employee WHERE name = '张三'); 
+3.13 SELECT DISTINCT e.name FROM employee e WHERE EXISTS (SELECT 1 FROM works_on w WHERE w.essn = e.ssn AND w.pno NOT IN (SELECT pno FROM works_on WHERE essn = (SELECT ssn FROM employee WHERE name = '张三'))) AND e.ssn <> (SELECT ssn FROM employee WHERE name = '张三'); 
+3.14 SELECT e.name FROM employee e WHERE NOT EXISTS (SELECT 1 FROM works_on w2 WHERE w2.essn = (SELECT ssn FROM employee WHERE name = '王二') AND NOT EXISTS (SELECT 1 FROM works_on w1 WHERE w1.essn = e.ssn AND w1.pno = w2.pno)) AND e.ssn <> (SELECT ssn FROM employee WHERE name = '王二'); 
+3.15 SELECT e.name, AVG(w.hours) AS avg_hours FROM employee e JOIN works_on w ON e.ssn = w.essn GROUP BY e.ssn, e.name HAVING SUM(CASE WHEN w.hours >= 100 THEN 1 ELSE 0 END) >= 2 AND COUNT(DISTINCT w.pno) >= 2; 
+3.16 SELECT e.name FROM employee e JOIN works_on w ON e.ssn = w.essn JOIN project p ON w.pno = p.pnumber GROUP BY e.ssn, e.name HAVING COUNT(DISTINCT p.dnum) >= 3; 
+3.17 SELECT e.name FROM employee e JOIN works_on w ON e.ssn = w.essn WHERE w.pno IN ('p1','p2','p3') GROUP BY e.ssn, e.name HAVING COUNT(DISTINCT w.pno) = 3; 
+
+4.1 ALTER TABLE dependent ADD working_unit VARCHAR(100), ADD occupation VARCHAR(50); 
+4.2 UPDATE dependent SET working_unit = '某某公司', occupation = '工程师' WHERE essn = '230101199001011234' AND dependent_name = '李四妻'; 
+4.3 UPDATE employee SET salary = 3000; 
+4.4 UPDATE dependent SET occupation = '教师' WHERE essn = '230101198009081234' AND dependent_name = '张三妻';
+4.5 UPDATE employee SET salary = salary 1.10 WHERE dno IN (SELECT dnumber FROM department WHERE dname = '研究部'); 
+4.6 DELETE FROM dependent WHERE essn = '23010119950101XXXX'; 
+4.7 DELETE FROM employee WHERE dno IN (SELECT dnumber FROM department WHERE dname = '研究部');
+4.8 ALTER TABLE dependent DROP COLUMN working_unit; 
+4.9 ALTER TABLE dependent DROP COLUMN occupation;
+
+3.1：先在 works_on 里筛选 pno='p2' 的记录 → 投影 essn → 返回所有员工编号（可能重复）
+3.2：先把 employee 与 works_on、project 连起来 → 筛选 pname='哈同公路' → 投影员工姓名 → 去重
+3.3：先把 employee 与 department 连接 → 筛选 dname='研发部' → 投影员工姓名
+3.4：先把 employee 与 department 连接 → 筛选 dname='研发部' → 投影员工姓名和地址
+3.5：先把 employee 与 department 连接 → 筛选 dname='研发部' 且 salary < 3000 → 投影员工姓名和地址
+3.6：先找出在 works_on 里参与 p1 的 essn → 在 employee 里排除这些 ssn → 返回剩下员工姓名
+3.7：对每个员工，检查 dependent 表中是否有对应的 essn → 如果不存在 → 返回员工姓名
+3.8：先找到名字为“张红”的员工 ssn → 在 employee 里找 superssn 等于该 ssn 的员工 → 连接部门表 → 返回员工姓名和部门名
+3.9：先在 works_on 里按 essn 分组 → 统计每个员工参与的不同 pno 数 → 选出计数 ≥3 的员工编号
+3.10：先在 works_on 里筛选 pno 属于 p1/p2 的记录 → 按 essn 分组 → 统计不同 pno → 要求等于 2 → 返回员工编号（即同时参与 p1 和 p2）
+3.11：先把 employee 与 works_on 做左连接 → 按员工分组 → 统计员工参与的不同项目数 → 要求等于 project 表中项目总数 → 返回员工编号和姓名
+3.12：先把 employee 与 works_on 连接 → 筛选 pno='p2' → 再筛选 salary < 张三工资 → 投影员工姓名 → 去重
+3.13：先找出张三参与的项目集合 → 对每个员工，检查其参与的项目中是否存在张三未参与的 → 排除张三本人 → 返回员工姓名 → 去重
+3.14：先找出王二参与的项目集合 → 对每个员工，检查是否不存在王二参与而自己不参与的项目 → 排除王二本人 → 返回员工姓名
+3.15：先把 employee 与 works_on 连接 → 按员工分组 → 统计工时 ≥100 的记录数 ≥2 且参与不同项目数 ≥2 → 返回员工姓名和平均工时
+3.16：先把 employee 与 works_on 和 project 连接 → 按员工分组 → 统计参与项目所属部门的不同数 ≥3 → 返回员工姓名
+3.17：先在 works_on 里筛选 pno 属于 p1/p2/p3 的记录 → 按员工分组 → 统计不同 pno 出现次数 → 要求等于 3 → 返回员工姓名

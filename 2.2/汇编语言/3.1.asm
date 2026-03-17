@@ -1,0 +1,88 @@
+DATAS SEGMENT
+    STRING DB 100 DUP('$')  ; 输入字符串
+    PROMPT1 DB 'Enter string: $'
+    PROMPT2 DB 0DH, 0AH, 'Replaced string: $'
+    POS_MSG DB 0DH, 0AH, 'Char "&" location: $'
+    SPACE DB ' ' 
+DATAS ENDS
+
+STACKS SEGMENT
+    DB 100H DUP(0)  
+STACKS ENDS
+
+CODES SEGMENT
+    ASSUME CS:CODES, DS:DATAS, SS:STACKS
+START:
+    MOV AX, DATAS
+    MOV DS, AX
+
+    ; 显示提示信息
+    MOV DX, OFFSET PROMPT1
+    MOV AH, 09H
+    INT 21H
+
+    ; 读取输入字符串
+    MOV DX, OFFSET STRING
+    MOV AH, 0AH
+    INT 21H
+
+    ; 替换 '&' 并记录位置
+    MOV SI, OFFSET STRING
+    ADD SI, 2  
+
+CHECK_REPLACE:
+    MOV AL, [SI]
+    CMP AL, 0DH  
+    JE DONE_REPLACE
+    CMP AL, '&'
+    JNE SKIP_REPLACE
+
+    MOV BYTE PTR [SI], ' '  ; 替换 '&' 为空格
+
+    ; 显示被替代字符的位置
+    PUSH AX
+    PUSH DX
+    PUSH SI
+
+    MOV DX, OFFSET POS_MSG
+    MOV AH, 09H
+    INT 21H
+
+    MOV DX, SI
+    CALL PRINT_NUMBER
+
+    POP SI
+    POP DX
+    POP AX
+
+SKIP_REPLACE:
+    INC SI
+    JMP CHECK_REPLACE
+
+DONE_REPLACE:
+    MOV DX, OFFSET PROMPT2
+    MOV AH, 09H
+    INT 21H
+
+    MOV DX, OFFSET STRING
+    ADD DX, 2  
+    MOV AH, 09H
+    INT 21H
+
+    MOV AH, 4CH  
+    INT 21H
+
+; 显示数字
+PRINT_NUMBER PROC
+    MOV AX, DX
+    AAM
+    ADD AX, 3030H
+    MOV DX, AX
+    MOV AH, 02H
+    INT 21H
+    RET
+PRINT_NUMBER ENDP
+
+CODES ENDS
+END START
+
