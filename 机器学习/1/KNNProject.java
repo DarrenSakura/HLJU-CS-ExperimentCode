@@ -45,26 +45,31 @@ public class KNNProject {
         double[] mean;
         double[] std;
 
+        // 在训练集上计算每个特征的均值和标准差
         public void fit(List<Instance> trainData) {
             if (trainData.isEmpty()) return;
             int numFeatures = trainData.get(0).features.length;
             mean = new double[numFeatures];
             std = new double[numFeatures];
 
+            // 先统计均值
             for (Instance inst : trainData) {
                 for (int i = 0; i < numFeatures; i++) mean[i] += inst.features[i];
             }
             for (int i = 0; i < numFeatures; i++) mean[i] /= trainData.size();
 
+            // 再统计方差并开方得到标准差
             for (Instance inst : trainData) {
                 for (int i = 0; i < numFeatures; i++) std[i] += Math.pow(inst.features[i] - mean[i], 2);
             }
             for (int i = 0; i < numFeatures; i++) {
                 std[i] = Math.sqrt(std[i] / trainData.size());
+                // 避免除以 0：若某列特征恒定，则该列缩放后保持 0
                 if (std[i] == 0) std[i] = 1.0; 
             }
         }
 
+        // 使用训练集统计量对单个样本做标准化
         public Instance transform(Instance inst) {
             double[] scaledFeatures = new double[inst.features.length];
             for (int i = 0; i < inst.features.length; i++) {
@@ -73,6 +78,7 @@ public class KNNProject {
             return new Instance(scaledFeatures, inst.label);
         }
 
+        // 批量标准化，内部复用单样本 transform，确保逻辑一致
         public List<Instance> transform(List<Instance> data) {
             List<Instance> scaledData = new ArrayList<>();
             // 明确调用当前类的 transform(Instance) 方法
@@ -89,22 +95,27 @@ public class KNNProject {
         private List<Instance> trainData;
 
         public KNNClassifier(int k) { this.k = k; }
+        // 保存训练数据，供预测时计算邻居距离
         public void fit(List<Instance> trainData) { this.trainData = trainData; }
 
+        // 欧几里得距离：衡量两个样本在特征空间中的直线距离
         private double euclideanDistance(double[] f1, double[] f2) {
             double sum = 0.0;
             for (int i = 0; i < f1.length; i++) sum += Math.pow(f1[i] - f2[i], 2);
             return Math.sqrt(sum);
         }
 
+        // 预测流程：计算距离 -> 按距离排序 -> 取前 k 个邻居投票
         public String predict(Instance testInstance) {
             List<DistanceRecord> distances = new ArrayList<>();
             for (Instance trainInstance : trainData) {
                 distances.add(new DistanceRecord(trainInstance, euclideanDistance(testInstance.features, trainInstance.features)));
             }
+            // 从近到远排序，便于直接取最近邻
             distances.sort(Comparator.comparingDouble(d -> d.distance));
 
             Map<String, Integer> votes = new HashMap<>();
+            // 统计前 k 个最近邻的类别票数
             for (int i = 0; i < Math.min(k, distances.size()); i++) {
                 String label = distances.get(i).instance.label;
                 votes.put(label, votes.getOrDefault(label, 0) + 1);
@@ -112,6 +123,7 @@ public class KNNProject {
 
             String bestLabel = null;
             int maxVotes = -1;
+            // 选择得票最高的类别作为预测结果
             for (Map.Entry<String, Integer> entry : votes.entrySet()) {
                 if (entry.getValue() > maxVotes) {
                     maxVotes = entry.getValue();
@@ -121,6 +133,7 @@ public class KNNProject {
             return bestLabel;
         }
 
+        // 保存训练样本与其到当前测试样本距离的临时结构
         private static class DistanceRecord {
             Instance instance; double distance;
             DistanceRecord(Instance instance, double distance) {
@@ -134,20 +147,25 @@ public class KNNProject {
     // ==========================================
     static class Metrics {
         double accuracy; double macroPrecision; double macroRecall;
+        // 保存一次评估得到的三项指标
         public Metrics(double accuracy, double macroPrecision, double macroRecall) {
             this.accuracy = accuracy; this.macroPrecision = macroPrecision; this.macroRecall = macroRecall;
         }
     }
 
+    // 计算分类结果的准确率、宏平均精度和宏平均召回率
     public static Metrics evaluate(List<String> yTrue, List<String> yPred) {
+        // 使用真实标签中的类别集合作为宏平均的类别范围
         Set<String> classes = new HashSet<>(yTrue);
         int correct = 0;
         Map<String, Integer> TP = new HashMap<>();
         Map<String, Integer> FP = new HashMap<>();
         Map<String, Integer> FN = new HashMap<>();
 
+        // 初始化每个类别的 TP / FP / FN 计数
         for (String c : classes) { TP.put(c, 0); FP.put(c, 0); FN.put(c, 0); }
 
+        // 遍历样本，累计混淆统计
         for (int i = 0; i < yTrue.size(); i++) {
             String t = yTrue.get(i); String p = yPred.get(i);
             if (t.equals(p)) { correct++; TP.put(t, TP.get(t) + 1); } 
@@ -157,6 +175,7 @@ public class KNNProject {
         double accuracy = (double) correct / yTrue.size();
         double macroPrecision = 0.0; double macroRecall = 0.0;
         
+        // 对每个类别单独计算 Precision/Recall，再取宏平均
         for (String c : classes) {
             int tp = TP.get(c); int fp = FP.get(c); int fn = FN.get(c);
             macroPrecision += (tp + fp == 0) ? 0 : (double) tp / (tp + fp);
@@ -165,8 +184,10 @@ public class KNNProject {
         return new Metrics(accuracy, macroPrecision / classes.size(), macroRecall / classes.size());
     }
 
+    // 执行 k 折交叉验证，汇总所有验证样本后统一计算指标
     public static Metrics kFoldCrossValidation(List<Instance> dataset, int kFold, int knnK) {
         List<Instance> shuffled = new ArrayList<>(dataset);
+        // 固定随机种子，确保每次划分一致（可复现）
         Collections.shuffle(shuffled, new Random(42)); 
 
         int foldSize = shuffled.size() / kFold;
@@ -174,6 +195,7 @@ public class KNNProject {
         List<String> allPred = new ArrayList<>();
 
         for (int i = 0; i < kFold; i++) {
+            // 当前折验证集区间（最后一折包含剩余样本）
             int start = i * foldSize;
             int end = (i == kFold - 1) ? shuffled.size() : (i + 1) * foldSize;
 
@@ -182,6 +204,7 @@ public class KNNProject {
             trainSet.addAll(shuffled.subList(0, start));
             trainSet.addAll(shuffled.subList(end, shuffled.size()));
 
+            // 仅在训练集拟合标准化参数，避免验证集信息泄漏
             StandardScaler scaler = new StandardScaler();
             scaler.fit(trainSet);
             List<Instance> scaledTrain = scaler.transform(trainSet);
@@ -190,6 +213,7 @@ public class KNNProject {
             KNNClassifier knn = new KNNClassifier(knnK);
             knn.fit(scaledTrain);
 
+            // 收集该折的真实标签和预测标签
             for (Instance valInst : scaledVal) {
                 allTrue.add(valInst.label);
                 allPred.add(knn.predict(valInst));
@@ -198,6 +222,7 @@ public class KNNProject {
         return evaluate(allTrue, allPred);
     }
 
+    // 从文件加载数据：前 n-1 列为特征，最后一列为类别标签
     public static List<Instance> loadData(String filename) throws IOException {
         List<Instance> data = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
