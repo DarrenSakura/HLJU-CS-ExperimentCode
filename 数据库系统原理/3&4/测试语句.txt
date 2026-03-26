@@ -28,9 +28,9 @@ select name, pname, hours from employee, project, works_on where employee.ssn = 
 
 select name, pname, hours from department, employee, project, works_on where dnumber = dno and dname = '研发部' and employee.ssn = essn and project.pnumber = pno and sex = '男' and employee.salary > 3000
 
-select * from department, employee, project, works_on where dnumber = dno and dname = '研发部' and employee.ssn = essn and project.pnumber = pno and sex = '男' and employee.salary > 3000
-
 select name, dependent_name, pname, hours from department, employee, project, works_on, dependent where dependent.essn = ssn and dnumber = dno and dname = '研发部' and employee.ssn = works_on.essn and project.pnumber = pno and employee.sex = '男' and employee.salary > 3000
+
+select * from department, employee, project, works_on where dnumber = dno and dname = '研发部' and employee.ssn = essn and project.pnumber = pno and sex = '男' and employee.salary > 3000
 
 select name, dependent_name, dname, dlocation, pname, hours from department, depart_location, employee, project, works_on, dependent where dependent.essn = ssn and department.dnumber = dno and dname = '研发部' and department.dnumber = depart_location.dnumber and employee.ssn = works_on.essn and project.pnumber = pno and employee.sex = '男' and employee.salary > 3000
 
